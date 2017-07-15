@@ -29,8 +29,8 @@ Vote.prototype.renderNode = function(data){
 
 Vote.prototype.onVote = function(data){
   if(!data||!data.id||!this.voteData[data.id]){return;} 
-  this.voteData[data.id].count += 1;
-  this.renderNode(this.voteData[data.id]);
+  // this.voteData[data.id].count += 1;
+  this.submitVoteResult([data.id]);
 };
 
 Vote.prototype.bindEventToButton = function(){
@@ -67,6 +67,29 @@ Vote.prototype.fetchVoteDetail = function(){
     }
   });
 };
+
+Vote.prototype.submitVoteResult = function(items){
+  $.ajax({
+    url: "/votes/" + this.activityId + "/apply.json",
+    type: "post",
+    dataType: "json",
+    context: this,
+    data: JSON.stringify({vote_items: items}),
+    success: function(res){
+      if(res.status === "success"){
+        for(var i=0,len=items.length; i<len; i++){
+          if(this.voteData[items[i]]){
+            this.voteData[items[i]].count+=1;
+          }
+        }
+        this.render();
+      }
+    },
+    error: function(){
+      
+    }
+  });
+}
 
 
 
