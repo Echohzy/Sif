@@ -10,6 +10,10 @@ Vote.prototype.initial = function(options){
   if(!options){ return }
   this.voteData = options.initialData;
   this.activityId = options.activityId;
+  this.getDetailSuccess = options.getDetailSuccess;
+  this.getDetailError = options.getDetailError;
+  this.voteSuccess = options.voteSuccess;
+  this.voteError = options.voteError;
   this.fetchVoteDetail();
 };
 
@@ -29,7 +33,6 @@ Vote.prototype.renderNode = function(data){
 
 Vote.prototype.onVote = function(data){
   if(!data||!data.id||!this.voteData[data.id]){return;} 
-  // this.voteData[data.id].count += 1;
   this.submitVoteResult([data.id]);
 };
 
@@ -60,10 +63,13 @@ Vote.prototype.fetchVoteDetail = function(){
           this.voteData[vote_items[i].id].count = vote_items[i].count;
         }
         this.render();
+        this.getDetailSuccess&&this.getDetailSuccess(res.data);
+      }else{
+        this.getDetailError&&this.getDetailError(res);
       }
     },
-    error: function(){
-
+    error: function(xhr){
+      this.getDetailError&&this.getDetailError(xhr);
     }
   });
 };
@@ -83,10 +89,13 @@ Vote.prototype.submitVoteResult = function(items){
           }
         }
         this.render();
+        this.voteSuccess&&this.voteSuccess(res.data);
+      }else{
+        this.voteError&&this.voteError(res);
       }
     },
-    error: function(){
-      
+    error: function(xhr){
+      this.voteError&&this.voteError(xhr);
     }
   });
 }

@@ -16,6 +16,6 @@ Mock.mock(/\/votes\/[0-9]+?\.json/, "get", function(options){
 
 Mock.mock(/\/votes\/[0-9]+?\/apply\.json/, "post", function(options){
   return {
-    status: "success"
+    status: "error"
   }
 });
