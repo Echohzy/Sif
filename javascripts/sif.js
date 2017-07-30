@@ -1,4 +1,4 @@
-'use strict';
+
 
 var SIF = (function(undefined){
   var host = this
@@ -96,6 +96,34 @@ var SIF = (function(undefined){
     }
   }
 
+})(SIF);
+
+(function(S, undefined){
+  var win = S.Env.host,
+      navigator = win.navigator,
+      ua = navigator.userAgent || "";
+      
+  function toNumber(str){
+    var count = 0;
+    str.replace(/\./g, function(){
+      count++;
+      return count===1?".":"";
+    });
+    return parseFloat(str);
+  }
+  
+  S.mix(S,{
+    UA:{
+      shell: undefined,
+      os: undefined,
+      core: undefined
+    }
+  });
+  
+  
+  
+  
+  
 })(SIF)
 
 
