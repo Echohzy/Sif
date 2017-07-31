@@ -1,7 +1,5 @@
-
-
 var SIF = (function(undefined){
-  var host = this
+  var host = this || window;
 
   var S = {
 
@@ -311,9 +309,43 @@ var SIF = (function(undefined){
   })
 
 
-})(SIF)
+})(SIF);
 
 
+(function(S, undefined){
+  S.mix(S, {
+    Loader: {}
+  });
+
+  S.mix(S.Loader, {
+    status: {
+      'ERROR': -1,
+      'INIT': 0,
+      'LOADING': 1,
+      'LOADED': 2,
+      'DEPENDENCIES_READY': 3,
+      'DEPENDENCIES_LOADING': 4,
+      'DEPENDENCIES_LOADED': 5
+    }
+  });
+
+
+})(SIF);
+
+(function(S, undefined){
+  var target = document.getElementsByTagName('head')[0];
+  function getScripts(url, value){
+    var tag = document.createElement('script');
+
+    tag.src = url;
+    tag.async = value;
+    target.appendChild(tag);
+  }
+
+  getScripts("./javascripts/mock/mock_vote_data.js", false);
+  getScripts("./javascripts/wheels/vote_module.js", false);
+
+})(SIF);
 
 
 
