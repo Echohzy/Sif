@@ -333,17 +333,86 @@ var SIF = (function(undefined){
 })(SIF);
 
 (function(S, undefined){
-  var target = document.getElementsByTagName('head')[0];
-  function getScripts(url, value){
-    var tag = document.createElement('script');
 
-    tag.src = url;
-    tag.async = value;
-    target.appendChild(tag);
+  var addFilesCallbacks = {},
+    doc = S.Env.host.document,
+    headNode = doc.getElementsByTagName('head')[0] || doc.documentElement;
+
+  function getScript(url, success, charset){
+    var config = success,
+      isCss  = false,
+      m,
+      error,
+      attrs,
+      node,
+      callbacks;
+
+    if(S.isObject(succss)){
+      success = config.success;
+      error = config.error;
+      attrs = config.attrs;
+    }
+
+    if( (m= url.match(/^.+(\.\w+)$/)) && m[1] === ".css"){
+      isCss = true;
+    }
+
+    callbacks = addFilesCallbacks[url] = addFilesCallbacks[url] || [];
+
+    callbacks.push([success, error]);
+
+    if(callbacks.length>1){
+      return callbacks.node;
+    }
+
+    node = document.createElement(isCss ? "link" : "script");
+
+    if(isCss){
+      node.href = url;
+      node.rel = "stylesheet";
+    }else{
+      node.src = url;
+      node.async = true
+    }
+
+    if(attrs){
+      for(var i=0,len=attrs.length; i<len; i++){
+        node.setAttribute(attrs[i].name, attrs[i].value);
+      }
+    }
+
+    callbacks.node = node;
+
+    function complete(status){
+      for(var i=0,len=callbacks;i<len;i++){
+        if(callbacks[i][status]){
+          callbacks[i][status].apply(node);
+        }
+      }
+      delete addFilesCallbacks[url];
+    }
+
+    node.onerror = function(){
+      node.onerror = null;
+      complete(1);
+    }
+
+    node.onload = function(){
+      node.onload = null;
+      end(0);
+    }
+
+    if(isCss){
+      headNode.appendChild(node);
+    }else{
+      headNode.insertBefore(node, headNode.firstChild);
+    }
+    return node;
   }
 
-  getScripts("./javascripts/mock/mock_vote_data.js", false);
-  getScripts("./javascripts/wheels/vote_module.js", false);
+  S.mix(S.Loader, {
+      getScripts: getScript
+  });
 
 })(SIF);
 
