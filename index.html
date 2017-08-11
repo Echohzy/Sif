@@ -3,18 +3,30 @@
     <head>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
         <title>test</title>
+        <style>
+            .vote-item{
+                margin: 20px 0;
+            }
+            .vote-item-wrapper{
+                position: relative;
+            }
+            .vote-item-wrapper .vote-item{
+                position: absolute;
+                top: 0;
+            }
+        </style>
     </head>
     <body>
         <div class="vote-block">
             <div class="vote-item">
-                <p>1</p>
                 <span class="vote-result-1"></span>
-                <button class="vote-button-1">vote</button>
+                <button class="vote-button-1" onclick="console.log(this)">vote</button>
             </div>
-            <div class="vote-item">
-                <p>2</p>
-                <span class="vote-result-2"></span>
-                <button class="vote-button-2">vote</button>
+            <div class="vote-item-wrapper">
+                <div class="vote-item">
+                    <span class="vote-result-2"></span>
+                    <button class="vote-button-2">vote</button>
+                </div>
             </div>
             <div class="vote-submit" id="vote-submit">
                 

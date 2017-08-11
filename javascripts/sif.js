@@ -329,6 +329,10 @@ var SIF = (function(undefined){
     }
   });
 
+  S.mix(S.Loader, {
+    mods:{}
+  });
+
 
 })(SIF);
 
@@ -411,10 +415,45 @@ var SIF = (function(undefined){
   }
 
   S.mix(S.Loader, {
-      getScripts: getScript
+      getScript: getScript
   });
 
 })(SIF);
+
+(function(S, undefined){
+    var toString = Object.prototype.toString,
+      slice = [].slice,
+      mods = S.Loader.mods,
+      getScript = S.getScript,
+      STATUS = S.Loader.status;
+
+
+    function define(url, requires, factory){
+      if(!url){
+        return;
+      }
+      var args = slice.call(arguments),
+        path = /\.js$/.test(url) ? url : url + "index.js"; //add index.js
+
+
+      if(!args[2]){
+        factory = requires;
+        requires = null;
+      }
+
+      if(mods[url]){
+        throw TypeError("Module" + url + " has been defined already");
+      }
+
+
+    }
+
+    
+
+    S.mix(S, {
+      define: define
+    });
+})(SIF)
 
 
 
