@@ -423,37 +423,107 @@ var SIF = (function(undefined){
 (function(S, undefined){
     var toString = Object.prototype.toString,
       slice = [].slice,
+      getScript = S.Loader.getScript,
       mods = S.Loader.mods,
-      getScript = S.getScript,
       STATUS = S.Loader.status;
-
-
-    function define(url, requires, factory){
-      if(!url){
+    
+    function getFullPath(moduleName){
+      return /\.js$/.test(moduleName) ? url : url + "index.js";
+    }
+    
+    function setModule(moduleName, params, factory){
+      var _module,fn;
+      
+      if(mods[moduleName]){
+        _module = mods[moduleName];
+        _module.exports = factory.apply(_module, params);
+        _module.status = STATUS['LOADED'];
+        while(fn = _module.callback.shift()){
+          fn&&fn.apply(null, _module.exports);
+        }
+      } else {
+        factory&&factory.apply(null, params);
+      }
+    }
+    function loadModule(moduleName, callback){
+      if(!moduleName){
         return;
       }
-      var args = slice.call(arguments),
-        path = /\.js$/.test(url) ? url : url + "index.js"; //add index.js
-
-
-      if(!args[2]){
-        factory = requires;
-        requires = null;
+      if(mods[moduleName]){
+        var _module = mods[moduleName];
+        if(_module.status===STATUS["LOADING"]){
+          _module.callback.push(callback);
+        }else{
+          setTimeout(callback, 0, _module.exports);
+        }
+      } else {
+        S.mix(mods, {
+          [moduleName]:{
+            moduleName: moduleName,
+            status: STATUS['LOADING'],
+            exports: null,
+            callback:[callback]
+          }
+        });
+        
+        getScript(getFullPath(moduleName));
       }
-
-      if(mods[url]){
-        throw TypeError("Module" + url + " has been defined already");
-      }
-
-
-    }
-
     
-
+    }
+    
+    function define(moduleName, deps, factory){
+      var args = slice.call(arguments),
+        factory = args.pop(),
+        deps = (args.length&&S.isArray(args[args.length-1]))?args.pop():[],
+        moduleName = args[0]||null,
+        len=0,
+        i=0,
+        depsCount=0,
+        params=[];
+      if(mods[moduleName]){
+        throw new TypeError("Module "+moduleName+" has been defined already!");
+      }
+      
+      if(deps&&(len=deps.length)){
+        while(i<len){
+          depsCount++;
+          (function(i){
+            loadModule(deps[i], function(mod){
+              depsCount--;
+              params.push(mod);
+              if(depsCount===0){
+                setModule(moduleName, params, factory);
+              }
+            });
+          })(i);
+          i++;
+        }
+      }else{
+        setModule(moduleName, [], factory);
+      }
+    }
+    
+    function require(deps, factory){
+        if(!deps){
+          return;
+        }
+        if(S.isFunction(deps)){
+          factory = deps;
+          deps = null;
+          factory();
+          return;
+        }else if(S.isString(deps)){
+          deps = [deps];
+        }
+        define(deps, factory);
+    }
     S.mix(S, {
-      define: define
+      define: define,
+      require: require
     });
-})(SIF)
+})(SIF);
+
+
 
 
 
