@@ -329,11 +329,6 @@ var SIF = (function(undefined){
     }
   });
 
-  S.mix(S.Loader, {
-    mods:{}
-  });
-
-
 })(SIF);
 
 (function(S, undefined){
@@ -351,7 +346,7 @@ var SIF = (function(undefined){
       node,
       callbacks;
 
-    if(S.isObject(succss)){
+    if(S.isObject(success)){
       success = config.success;
       error = config.error;
       attrs = config.attrs;
@@ -403,7 +398,7 @@ var SIF = (function(undefined){
 
     node.onload = function(){
       node.onload = null;
-      end(0);
+      complete(0);
     }
 
     if(isCss){
@@ -424,11 +419,11 @@ var SIF = (function(undefined){
     var toString = Object.prototype.toString,
       slice = [].slice,
       getScript = S.Loader.getScript,
-      mods = S.Loader.mods,
+      mods = S.Env.mods,
       STATUS = S.Loader.status;
     
     function getFullPath(moduleName){
-      return /\.js$/.test(moduleName) ? url : url + "index.js";
+      return /\.js$/.test(moduleName) ? moduleName : moduleName + "/index.js";
     }
     
     function setModule(moduleName, params, factory){
@@ -439,7 +434,7 @@ var SIF = (function(undefined){
         _module.exports = factory.apply(_module, params);
         _module.status = STATUS['LOADED'];
         while(fn = _module.callback.shift()){
-          fn&&fn.apply(null, _module.exports);
+          fn&&fn(_module.exports);
         }
       } else {
         factory&&factory.apply(null, params);
@@ -480,9 +475,6 @@ var SIF = (function(undefined){
         i=0,
         depsCount=0,
         params=[];
-      if(mods[moduleName]){
-        throw new TypeError("Module "+moduleName+" has been defined already!");
-      }
       
       if(deps&&(len=deps.length)){
         while(i<len){
@@ -503,6 +495,7 @@ var SIF = (function(undefined){
       }
     }
     
+
     function require(deps, factory){
         if(!deps){
           return;
