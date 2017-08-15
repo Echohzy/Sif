@@ -67,7 +67,7 @@ SIF.define("javascripts/Promise", function(){
   }
 
   function unwrap(promise, resolver, value){
-    setTimeout(function(){
+    SIF.setImmediate(function(){
       var returnValue;
       try{
         returnValue = resolver(value);
@@ -80,7 +80,7 @@ SIF.define("javascripts/Promise", function(){
       }else{
         return resolve(promise, returnValue);
       }
-    }, 0);
+    });
   }
 
   function promiseQueueItem(promise, onResolved, onRejected){
@@ -101,7 +101,7 @@ SIF.define("javascripts/Promise", function(){
 
     if(SIF.isFunction(onRejected)){
       this.rejectCallback = function(error){
-        unwrap(this.promise, onReject, error);
+        unwrap(this.promise, onRejected, error);
       }
     }
   }
@@ -134,8 +134,8 @@ SIF.define("javascripts/Promise", function(){
       return promise;
   };
   
-  Promise.prototype.catch = function(onReject){
-      this.then(null, onReject);
+  Promise.prototype.catch = function(onRejected){
+      this.then(null, onRejected);
   };
   
   Promise.resolve = function(value){

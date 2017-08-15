@@ -516,6 +516,64 @@ var SIF = (function(undefined){
     });
 })(SIF);
 
+(function(S, undefined){
+
+
+  var host = S.Env.host,
+    queue = [],
+    finished = 0,
+    immediate;
+
+  if(host.setImmediate){
+     immediate = function(fn){
+        host.setImmediate(fn);
+     }
+  }else if(MessageChannel){
+
+    function triggerQueue(){
+      var i=0, fn;
+
+      while(fn=queue[i++]){
+        try{
+          fn();
+        }catch(e){
+          setTimeout(function(){
+            throw new TypeError(e);
+          },0)
+        }
+      }
+      if(i>0){
+        queue = [];
+      }
+      finished = 0;
+    }
+
+    var channel = new MessageChannel();
+
+    channel.port1.onmessage = function(){
+      triggerQueue();
+    }
+
+    immediate = function(fn){
+      queue.push(fn);
+      if(!finished){
+        channel.port2.postMessage(0);
+      }
+    }
+  }else{
+    immediate = function(fn){
+      setTimeout(fn, 0);
+    }
+  }
+
+  S.mix(S,{
+    setImmediate: immediate
+  });
+  
+})(SIF)
+
+
+
 
 
 
