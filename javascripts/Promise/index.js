@@ -197,29 +197,34 @@ SIF.define("javascripts/Promise", function(){
     var len = iterable.length,
       resolved = 0,
       called = false,
+      values = new Array(len),
       i=-1;
+    if(!len){
+      return this.resolve([]);
+    }
 
     var promise = new this(EMPTY);
 
-    function allResolved(value){
+    function allResolved(value, i){
       self.resolve(value).then(function(response){
+        values[i] = response;
         resolved++;
         if(resolved===len&&!called){
           called = true;
-          resolve(promise, response);
+          resolve(promise, values);
         }
       }, function(error){
         if(!called){
           called = true;
           reject(promise, error);
         }
-      })
+      });
     }
     while(++i<len){
-      allResolved(iterable[i]);
+      allResolved(iterable[i], i);
     }
     return promise;
-  }
+  };
   
   return Promise;
 });
