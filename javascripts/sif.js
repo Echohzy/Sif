@@ -97,6 +97,16 @@ var SIF = (function(undefined){
 })(SIF);
 
 (function(S, undefined){
+  function debounce(func, wait){
+    
+  }
+  
+  S.mix(S,{
+    debounce: debounce
+  });
+})(SIF);
+
+(function(S, undefined){
   var win = S.Env.host,
       navigator = win.navigator,
       doc = win.document;
