@@ -97,8 +97,41 @@ var SIF = (function(undefined){
 })(SIF);
 
 (function(S, undefined){
-  function debounce(func, wait){
+  function debounce(func, wait, immediate){
+    var slice=[].slice,
+      timeout,
+      result;
     
+    function later(context, args){
+      timeout = null;
+      if(args){
+        result = func.apply(context, args);
+      }
+    }
+    
+    function debounced(){
+      var args = slice.call(arguments);
+      
+      if(timeout){
+        clearTimeout(timeout);
+      }
+      if(immediate){
+        var callnow = !timeout;
+        timeout = setTimeout(later, wait);
+        if(callnow) result = func.apply(this, args);
+      }else{
+        timeout = setTimeout(later, wait, this, args);
+      }
+      
+      
+    }
+    
+    debounced.cancel = function(){
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    
+    return debounced;
   }
   
   S.mix(S,{
