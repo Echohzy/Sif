@@ -96,6 +96,20 @@ var SIF = (function(undefined){
 
 })(SIF);
 
+
+(function(S, undefined){
+  var slice = [].slice;
+
+  function toArray(arr){
+    return slice.call(arr);
+  }
+
+  S.mix(S, {
+    toArray: toArray
+  });
+
+})(SIF);
+
 (function(S, undefined){
   function debounce(func, wait, immediate){
     var slice=[].slice,
@@ -525,7 +539,7 @@ var SIF = (function(undefined){
           (function(i){
             loadModule(deps[i], function(mod){
               depsCount--;
-              params.push(mod);
+              params[i] = mod;
               if(depsCount===0){
                 setModule(moduleName, params, factory);
               }

@@ -3,6 +3,7 @@
 SIF.define("javascripts/Fetch", ["javascripts/Promise"], function(Promise){
 
   function fetch(url, config){
+    console.log(arguments);
     config = config||{};
     return new Promise(function (resolve, reject){
       var client = new XMLHttpRequest();
@@ -17,6 +18,7 @@ SIF.define("javascripts/Fetch", ["javascripts/Promise"], function(Promise){
           reject(new Error(this.statusText));
         }
       };
+      console.log(client);
       client.responseType = "json";
       client.setRequestHeader("Accept", "application/json");  
       client.send(config.data||{});

@@ -12,7 +12,7 @@ SIF.define("javascripts/Observer", function(){
         }
       },
       fire: function(type){
-        if(_message[type&&SIF.isArray(_message[type]){
+        if(_message[type]&&SIF.isArray(_message[type])){
           for(var i=0,len=_message[type].length; i<len; i++){
             _message[type][i].apply(this, arguments.slice(1));
           }
@@ -20,7 +20,7 @@ SIF.define("javascripts/Observer", function(){
       },
       remove: function(type, fn){
         if(_message[type]&&SIF.isArray(_message[type])){
-          for(var i=_message[type]-1;i>=0;i-){
+          for(var i=_message[type].length-1;i>=0;i--){
             if(_message[type][i]===fn){
               _message[type].splice(i,1);
             }
@@ -29,4 +29,6 @@ SIF.define("javascripts/Observer", function(){
       }
     }
   })();
+
+  return Observer;
 });
