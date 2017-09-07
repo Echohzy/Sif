@@ -11,7 +11,28 @@ SIF.require(["javascripts/Promise", "javascripts/Fetch", "javascripts/Observer",
   // }).then((data)=>{
   //   console.log("then3"+data);
   // });
+  
+  function wait(time){
+    var now = (new Date()).getTime();
+    while((new Date()).getTime()<now+(time*1000)){
+    }
+  }
   new Lazyload("test");
   
- 
+  // setTimeout(function(){
+  //   console.log(new Date, "setTimeout2");
+  // },2000);
+
+  var timeout = setTimeout(function(){
+    console.log((new Date()).getTime(), "setInterval");
+    wait(0.5);
+    timeout  = setTimeout(arguments.callee,1000);
+  }, 1000)
+  
+  setTimeout(function(){
+    clearTimeout(timeout);
+    timeout = null;
+  },10000);
+  
+
 });
